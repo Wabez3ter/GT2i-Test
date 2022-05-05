@@ -1,9 +1,9 @@
 <?php
+//J'import le fichier que vous m'avez envoyé pour parser le fichier XML
 require("MagicParser.php");
 
 function addToDatabase($record){
-    //Test
-    //var_dump($record);
+    //Set de tous les paramètres de la requête BD
     $PRODUIT_POCLEUNIK = $record["PRODUIT_POCLEUNIK"];
     $PRODUIT_REF = $record["PRODUIT_REF"];
     $REFCIALE_ARCLEUNIK = $record["REFCIALE_ARCLEUNIK"];
@@ -32,22 +32,29 @@ function addToDatabase($record){
 
 
 
-    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT | MYSQLI_REPORT_ALL);
+    //Pour les erreurs de MySQL: mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT | MYSQLI_REPORT_ALL);
+    //Connexion à la Base de Données
     $con = mysqli_connect("localhost", "root", "", "gt2i");
+
+    //Si il y a une erreur dans la connexion
     if ($con->connect_errno) {
         die("Connexion Error " . $con->connect_error);
     }
 
+    //Si la préparation est possible alors
     if ($stmt = $con->prepare("INSERT INTO catalogue(PRODUIT_POCLEUNIK, PRODUIT_REF, REFCIALE_ARCLEUNIK, REFCIALE_REFART, REFCIALE_REFCAT, POTRAD_DESI, REFCIALE_CTVA, FICTECH_MEMOCAT, FICTECH_MEMONET, PRODUIT_MARQUE, PRODUIT_CLEP01, PRODUIT_CLEP02, PRODUIT_CLEP03, PRODUIT_CLEP04, PRODUIT_CLEP06, PRODUIT_CLEP07, PRODUIT_GCOLORIS, PRODUIT_GTAILLE, PRODUIT_CLEP12, REFCIALE_FICHEINA, REFCIALE_MODTE, PRODUIT_MODTE, ARTICLE_POIDS, ARTICLE_HNORMEL, ARTICLE_CATEG) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
+        //Bind des parametres avec le type, suivi de tous les paramètres.
         $stmt->bind_param("isisssisisssssssiisiiidii", $PRODUIT_POCLEUNIK, $PRODUIT_REF,$REFCIALE_ARCLEUNIK,$REFCIALE_REFART,$REFCIALE_REFCAT,$POTRAD_DESI,$REFCIALE_CTVA,$FICTECH_MEMOCAT,$FICTECH_MEMONET,$PRODUIT_MARQUE, $PRODUIT_CLEP01,$PRODUIT_CLEP02,$PRODUIT_CLEP03,$PRODUIT_CLEP04,$PRODUIT_CLEP06,$PRODUIT_CLEP07,$PRODUIT_GCOLORIS,$PRODUIT_GTAILLE,$PRODUIT_CLEP12,$REFCIALE_FICHEINA,$REFCIALE_MODTE,$PRODUIT_MODTE,$ARTICLE_POIDS,$ARTICLE_HNORMEL,$ARTICLE_CATEG);
 
+        //Execution de la commande
         $stmt->execute();
         $stmt->close();
     }
 
+    //Fermeture de la connexion
     $con->close();
 }
 
-
+//Je lance le parse du fichier 'catalogue.xml', avec comme paramètre le nom du fichier, la fonction à executer et enfin le format du fichier
 MagicParser_parse("catalogue.XML","addToDatabase","xml|HF_DOCUMENT/FLIGNE/");
 ?>
